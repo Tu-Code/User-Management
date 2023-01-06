@@ -1,9 +1,17 @@
 const express = require('express');
-const router = express.Router();
-const userService = require('../services/user')
-const userValidation = require('../validations/user')
 const { User } = require('../models/User');
+const userService = require('../services/userService')
+const userValidation = require('../validations/user');
 const bcrypt = require('bcryptjs');
+const router = express.Router();
+const path = require('path');
+const cors = require('cors');
+
+router.use(cors());
+
+router.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../views', 'userManagement.html'))
+});
 
 router.post('/users', async (req, res) =>{
     const { error } = userValidation.validate(req.body);
