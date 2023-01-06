@@ -1,4 +1,14 @@
 const Joi = require("joi");
+const { User } = require('../models/User')
+
+async function validateEmail(email) {
+    const emailExists = await User.exists({ email });
+    if (emailExists) {
+      throw new Error('Email already exists');
+    }
+    return email;
+
+}
 
 module.exports = Joi.object({
   firstName: Joi.string().max(100).required(),
