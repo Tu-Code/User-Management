@@ -118,7 +118,8 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <input type="submit" value="Add" class="btn btn-primary" style="cursor:pointer;">
+                                <button type="button" class="btn btn-primary" v-on:click="addUser">Add</button>
+
                             </div>
                         </div>
                     </div>
@@ -201,10 +202,6 @@
                                             <label for="changeId">User ID:</label>
                                             <input type="text" v-model="changeId" id="changeId" required>
                                             <br>
-                                            <label for="currentPassword">Current Password:</label>
-                                            <input type="password" v-model="currentPassword" id="currentPassword"
-                                                required>
-                                            <br>
                                             <label for="newPassword">New Password:</label>
                                             <input type="password" v-model="newPassword" id="newPassword" required>
                                             <br>
@@ -213,8 +210,9 @@
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary"
                                             data-dismiss="modal">Close</button>
-                                        <input type="submit" value="Change" class="btn btn-primary"
-                                            style="cursor:pointer;">
+                                        <!-- <input type="submit" value="Change" class="btn btn-primary"
+                                            style="cursor:pointer;"> -->
+                                        <button type="button" class="btn btn-primary" v-on:click="changePassword">Change</button>
                                     </div>
                                 </div>
                             </div>
@@ -272,10 +270,11 @@
             viewId: '',
             viewedUser: null,
             changeId: '',
-            currentPassword: '',
+            // currentPassword: '',
             newPassword: '',
             search: '', // search input value
             page: 1, // current page number
+            currentPage: 1,
             limit: 10, // number of users per page
             lastPage: 1 // last page number
         },
@@ -317,6 +316,7 @@
             },
             // Add a new user to the API and update the users array
             addUser: function () {
+                console.log("I am new user");
                 fetch('http://localhost:3000/users', {
                         method: 'POST',
                         body: JSON.stringify(this.newUser),
@@ -326,14 +326,17 @@
                     })
                     .then(response => response.json())
                     .then(json => {
-                        console.log("I am check");
-                        this.users.push(json.user);
+                        console.log("I am new user" + json.users);
+                        this.users.push(this.newUser);
                         this.newUser.firstName = '';
                         this.newUser.lastName = '';
                         this.newUser.email = '';
                         this.newUser.password = '';
+                    }).catch((error) => {
+                        console.error(error);
                     });
             },
+
             // View a single user
             viewUser: function () {
                 fetch(`http://localhost:3000/users/${this.viewId}`)
@@ -352,15 +355,15 @@
                 fetch(`http://localhost:3000/users/${this.changeId}`, {
                     method: 'PUT',
                     body: JSON.stringify({
-                        currentPassword: this.currentPassword,
-                        newPassword: this.newPassword
+                        // currentPassword: this.currentPassword,
+                        password: this.newPassword
                     }),
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 });
                 this.changeId = '';
-                this.currentPassword = '';
+                // this.currentPassword = '';
                 this.newPassword = '';
             },
             filterUsers() {
