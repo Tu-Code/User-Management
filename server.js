@@ -5,7 +5,6 @@ const app = express()
 
 app.use(express.static('views'));
 
-
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
 
 const db = mongoose.connection

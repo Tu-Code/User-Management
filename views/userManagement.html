@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>User Management</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <style>
+        #app {
+            margin: 20px;
+        }
+
+        #app h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #app ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #app li {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        #app form label {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        #app form input[type="text"],
+        #app form input[type="password"] {
+            width: 100%;
+            font-size: 18px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        #app form input[type="submit"] {
+            font-size: 18px;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            /* background-color: #eee; */
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="row d-flex justify-content-between">
+            <!-- List all users -->
+            <div class="col">
+                <h1>List of Users</h1>
+            </div>
+
+            <!-- Add users -->
+            <div class="col">
+                    <!-- Add a user button -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addModal">
+                    Add User
+                </button>
+    
+                <!-- Add user Modal -->
+                <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addModalLabel">Add a User</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Add a user form -->
+                                <form v-on:submit.prevent="addUser">
+                                    <label for="firstName">First Name:</label>
+                                    <input type="text" v-model="newUser.firstName" id="firstName" required>
+                                    <br>
+    
+                                    <label for="lastName">Last Name:</label>
+                                    <input type="text" v-model="newUser.lastName" id="lastName" required>
+                                    <br>
+    
+                                    <label for="email">Email:</label>
+                                    <input type="text" v-model="newUser.email" id="email" required>
+                                    <br>
+    
+                                    <label for="password">Password:</label>
+                                    <input type="password" v-model="newUser.password" id="password" required>
+                                    <br>
+    
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <input type="submit" value="Add" class="btn btn-primary" style="cursor:pointer;">
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+            
+            <!-- View user -->
+            <div class="col">
+                <!-- View button -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#viewModal">
+                    View
+                </button>
+                <!-- View modal -->
+                <div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="viewModalLabel">View a User</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <form v-on:submit.prevent="viewUser">
+                        <div class="modal-body">
+                            <div class="form-group">
+                            <label for="viewId">User ID:</label>
+                            <input type="text" v-model="viewId" id="viewId" required class="form-control">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <input type="submit" value="View" class="btn btn-primary" style="cursor:pointer;">
+                        </div>
+                        </form>
+                        <div v-if="viewedUser">
+                        <p>{{ viewedUser.firstName }}</p>
+                        <p>{{ viewedUser.lastName }}</p>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+          
+        </div> 
+        <table class="table table-striped">
+        <thead>
+            <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="user in users" v-bind:key="user.id">
+            <td>{{ user.firstName }} {{ user.lastName }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                <!-- Change pwd button -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#changePasswordModal">
+                    Change Password
+                </button>
+                <!-- change pwd modal  -->
+                <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="changePasswordModalLabel">Change a User's Password</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                        <form v-on:submit.prevent="changePassword">
+                            <label for="changeId">User ID:</label>
+                            <input type="text" v-model="changeId" id="changeId" required>
+                            <br>
+                            <label for="currentPassword">Current Password:</label>
+                            <input type="password" v-model="currentPassword" id="currentPassword" required>
+                            <br>
+                            <label for="newPassword">New Password:</label>
+                            <input type="password" v-model="newPassword" id="newPassword" required>
+                            <br>
+                        </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <input type="submit" value="Change" class="btn btn-primary" style="cursor:pointer;">
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                
+            </td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+
+    <!-- Vue.js -->
+    <script src="http://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <!-- jQuery and Bootstrap script -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous">
+    </script>
+</body>
+
+</html>
+
+
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            users: [],
+            newUser: {
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: ''
+            },
+            viewId: '',
+            viewedUser: null,
+            changeId: '',
+            currentPassword: '',
+            newPassword: ''
+        },
+        methods: {
+            // Fetch all users from the API and update the users array
+            getUsers: function () {
+                fetch('http://localhost:3000/users')
+                    .then(response => response.json())
+                    .then(json => {
+                        console.log("I am check")
+                        console.log(json.users)
+                        this.users = json.users;
+                    });
+            },
+            // Add a new user to the API and update the users array
+            addUser: function () {
+                fetch('http://localhost:3000/users', {
+                        method: 'POST',
+                        body: JSON.stringify(this.newUser),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(json => {
+                        console.log("I am check");
+                        this.users.push(json.user);
+                        this.newUser.firstName = '';
+                        this.newUser.lastName = '';
+                        this.newUser.email = '';
+                        this.newUser.password = '';
+                    });
+            },
+            // View a single user
+            viewUser: function () {
+                fetch(`http://localhost:3000/users/${this.viewId}`)
+                    .then(response => response.json())
+                    .then(json => {
+                        console.log(json.user)
+                        this.viewedUser = json.user;
+                        console.log(this.viewedUser)
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            },
+            // Change a user's password
+            changePassword: function () {
+                fetch(`http://localhost:3000/users/${this.changeId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        currentPassword: this.currentPassword,
+                        newPassword: this.newPassword
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                this.changeId = '';
+                this.currentPassword = '';
+                this.newPassword = '';
+            }
+        },
+        // Fetch all users when the app loads
+        created: function () {
+            this.getUsers();
+        }
+
+    });
+</script>
