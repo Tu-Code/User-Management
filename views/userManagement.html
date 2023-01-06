@@ -61,18 +61,29 @@
 <body>
     <div id="app">
         <div class="row d-flex justify-content-between">
-            <!-- List all users -->
+
+            <!-- List all users  -->
             <div class="col">
                 <h1>List of Users</h1>
             </div>
 
+            <!-- search  -->
+            <div class="col">
+                <form>
+                    <div class="form-group">
+                        <label for="search">Search:</label>
+                        <input type="text" class="form-control" id="search" v-model="search" @input="filterUsers()">
+                    </div>
+                </form>
+            </div>
+
             <!-- Add users -->
             <div class="col">
-                    <!-- Add a user button -->
+                <!-- Add a user button -->
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addModal">
                     Add User
                 </button>
-    
+
                 <!-- Add user Modal -->
                 <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
                     aria-hidden="true">
@@ -90,19 +101,19 @@
                                     <label for="firstName">First Name:</label>
                                     <input type="text" v-model="newUser.firstName" id="firstName" required>
                                     <br>
-    
+
                                     <label for="lastName">Last Name:</label>
                                     <input type="text" v-model="newUser.lastName" id="lastName" required>
                                     <br>
-    
+
                                     <label for="email">Email:</label>
                                     <input type="text" v-model="newUser.email" id="email" required>
                                     <br>
-    
+
                                     <label for="password">Password:</label>
                                     <input type="password" v-model="newUser.password" id="password" required>
                                     <br>
-    
+
                                 </form>
                             </div>
                             <div class="modal-footer">
@@ -111,9 +122,9 @@
                             </div>
                         </div>
                     </div>
-                </div>  
+                </div>
             </div>
-            
+
             <!-- View user -->
             <div class="col">
                 <!-- View button -->
@@ -121,89 +132,115 @@
                     View
                 </button>
                 <!-- View modal -->
-                <div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel" aria-hidden="true">
+                <div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel"
+                    aria-hidden="true">
                     <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                        <h5 class="modal-title" id="viewModalLabel">View a User</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        </div>
-                        <form v-on:submit.prevent="viewUser">
-                        <div class="modal-body">
-                            <div class="form-group">
-                            <label for="viewId">User ID:</label>
-                            <input type="text" v-model="viewId" id="viewId" required class="form-control">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="viewModalLabel">View a User</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form v-on:submit.prevent="viewUser">
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="viewId">User ID:</label>
+                                        <input type="text" v-model="viewId" id="viewId" required class="form-control">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <input type="submit" value="View" class="btn btn-primary" style="cursor:pointer;">
+                                </div>
+                            </form>
+                            <div v-if="viewedUser">
+                                <p>{{ viewedUser.firstName }}</p>
+                                <p>{{ viewedUser.lastName }}</p>
+                                <p>{{ viewedUser.email }}</p>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <input type="submit" value="View" class="btn btn-primary" style="cursor:pointer;">
-                        </div>
-                        </form>
-                        <div v-if="viewedUser">
-                        <p>{{ viewedUser.firstName }}</p>
-                        <p>{{ viewedUser.lastName }}</p>
-                        </div>
-                    </div>
                     </div>
                 </div>
             </div>
-          
-        </div> 
+        </div>
+
+        <!-- list of users table -->
         <table class="table table-striped">
-        <thead>
-            <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Options</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="user in users" v-bind:key="user.id">
-            <td>{{ user.firstName }} {{ user.lastName }}</td>
-            <td>{{ user.email }}</td>
-            <td>
-                <!-- Change pwd button -->
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#changePasswordModal">
-                    Change Password
-                </button>
-                <!-- change pwd modal  -->
-                <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                        <h5 class="modal-title" id="changePasswordModalLabel">Change a User's Password</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="user in filteredUsers" v-bind:key="user.id">
+                    <td>{{ user.firstName }} {{ user.lastName }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <!-- Change pwd button -->
+                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                            data-target="#changePasswordModal">
+                            Change Password
                         </button>
+                        <!-- change pwd modal  -->
+                        <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog"
+                            aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="changePasswordModalLabel">Change a User's Password
+                                        </h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form v-on:submit.prevent="changePassword">
+                                            <label for="changeId">User ID:</label>
+                                            <input type="text" v-model="changeId" id="changeId" required>
+                                            <br>
+                                            <label for="currentPassword">Current Password:</label>
+                                            <input type="password" v-model="currentPassword" id="currentPassword"
+                                                required>
+                                            <br>
+                                            <label for="newPassword">New Password:</label>
+                                            <input type="password" v-model="newPassword" id="newPassword" required>
+                                            <br>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Close</button>
+                                        <input type="submit" value="Change" class="btn btn-primary"
+                                            style="cursor:pointer;">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="modal-body">
-                        <form v-on:submit.prevent="changePassword">
-                            <label for="changeId">User ID:</label>
-                            <input type="text" v-model="changeId" id="changeId" required>
-                            <br>
-                            <label for="currentPassword">Current Password:</label>
-                            <input type="password" v-model="currentPassword" id="currentPassword" required>
-                            <br>
-                            <label for="newPassword">New Password:</label>
-                            <input type="password" v-model="newPassword" id="newPassword" required>
-                            <br>
-                        </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <input type="submit" value="Change" class="btn btn-primary" style="cursor:pointer;">
-                        </div>
-                    </div>
-                    </div>
-                </div>
-                
-            </td>
-            </tr>
-        </tbody>
+                    </td>
+                </tr>
+            </tbody>
         </table>
+
+        <!-- pagination  -->
+        <nav aria-label="page navigation">
+            <ul class="pagination">
+                <li class="page-item" v-bind:class="{ 'disabled': currentPage === 1 }">
+                    <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)"
+                        style="cursor:pointer;">Previous</a>
+                </li>
+                <li class="page-item" v-for="page in pages" v-bind:key="page"
+                    v-bind:class="{ 'active': currentPage === page }">
+                    <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                </li>
+                <li class="page-item" v-bind:class="{ 'disabled': currentPage === pages.length }">
+                    <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)"
+                        style="cursor:pointer;">Next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 
     <!-- Vue.js -->
@@ -236,7 +273,36 @@
             viewedUser: null,
             changeId: '',
             currentPassword: '',
-            newPassword: ''
+            newPassword: '',
+            search: '', // search input value
+            page: 1, // current page number
+            limit: 10, // number of users per page
+            lastPage: 1 // last page number
+        },
+        computed: {
+            filteredUsers() {
+                // Filter the users by search query
+                let users = this.users;
+                if (this.search) {
+                    users = users.filter(user => {
+                        return user.firstName.toLowerCase().includes(this.search.toLowerCase()) ||
+                            user.lastName.toLowerCase().includes(this.search.toLowerCase()) ||
+                            user.email.toLowerCase().includes(this.search.toLowerCase());
+                    });
+                }
+                // Paginate the users
+                const start = (this.currentPage - 1) * this.limit;
+                const end = start + this.limit;
+                return users.slice(start, end);
+            },
+            pages() {
+                // Generate an array of pages for pagination
+                const pages = [];
+                for (let i = 1; i <= Math.ceil(this.users.length / this.limit); i++) {
+                    pages.push(i);
+                }
+                return pages;
+            }
         },
         methods: {
             // Fetch all users from the API and update the users array
@@ -296,6 +362,14 @@
                 this.changeId = '';
                 this.currentPassword = '';
                 this.newPassword = '';
+            },
+            filterUsers() {
+                // Reset the current page when the search query changes
+                this.currentPage = 1;
+            },
+            changePage(page) {
+                // Change the current page
+                this.currentPage = page;
             }
         },
         // Fetch all users when the app loads
