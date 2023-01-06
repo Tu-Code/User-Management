@@ -14,7 +14,13 @@ router.post('/users', async (req, res) =>{
             return res.status(400).send("user already exists");
         }
         
-        res.status(201).send(user);
+        const plainUser = {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+        };
+  
+        res.status(201).send(plainUser);
 
     } catch (err) {
         res.status(500).send("Failed to store user");
