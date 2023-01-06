@@ -326,7 +326,6 @@
                     })
                     .then(response => response.json())
                     .then(json => {
-                        console.log("I am new user" + json.users);
                         this.users.push(this.newUser);
                         this.newUser.firstName = '';
                         this.newUser.lastName = '';
