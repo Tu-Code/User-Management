@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const userService = require('../services/userService')
+const userService = require('../services/user')
 const userValidation = require('../validations/user')
 const { User } = require('../models/User');
 
@@ -55,6 +55,17 @@ router.get('/users', (req, res) => {
 //find a user by ID
 router.get("/users/:id", async (req, res) => {
     // do something
+    try {
+        const user = await userService.findOneById(req.params.id);
+    
+        if (!user) {
+          return res.status(404).send("User not found");
+        }
+    
+        res.json({ user });
+    } catch (err) {
+        res.status(500).send("Failed to retrieve user");
+    }
 });
 
 router.put('/users/:id', (req, res) => {
