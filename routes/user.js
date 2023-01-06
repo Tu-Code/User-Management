@@ -3,6 +3,7 @@ const express = require('express');
 const { User } = require('../models/User');
 const userService = require('../services/user')
 const userValidation = require('../validations/user');
+const passwordValidation = require('../validations/password')
 const bcrypt = require('bcryptjs');
 const router = express.Router();
 const path = require('path');
@@ -73,6 +74,9 @@ router.get("/users/:id", async (req, res) => {
 });
 
 router.put('/users/:id/update/password', async (req, res) => {
+    const { error } = passwordValidation.validate(req.body);
+    if (error) return res.status(422).send(error.details[0].message)
+
     try {
         const user = await userService.updatePssword(req.params.id, req.body.password);
     
