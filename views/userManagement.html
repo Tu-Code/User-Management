@@ -307,7 +307,7 @@
         methods: {
             // Fetch all users from the API and update the users array
             getUsers: function () {
-                fetch(`http://localhost:3000/users?search=${this.search}&page=${this.page}&limit=${this.limit}`)
+                fetch('http://localhost:3000/users')
                     .then(response => response.json())
                     .then(json => {
                         console.log("I am check")
@@ -349,10 +349,11 @@
             },
             // Change a user's password
             changePassword: function () {
-                fetch(`http://localhost:3000/users/${this.changeId}/update/password`, {
+                fetch(`http://localhost:3000/users/${this.changeId}`, {
                     method: 'PUT',
                     body: JSON.stringify({
-                       password: this.newPassword
+                        currentPassword: this.currentPassword,
+                        newPassword: this.newPassword
                     }),
                     headers: {
                         'Content-Type': 'application/json'
