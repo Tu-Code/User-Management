@@ -3,6 +3,7 @@ const router = express.Router();
 const userService = require('../services/user')
 const userValidation = require('../validations/user')
 const { User } = require('../models/User');
+const bcrypt = require('bcryptjs');
 
 router.post('/users', async (req, res) =>{
     const { error } = userValidation.validate(req.body);
@@ -69,7 +70,25 @@ router.get("/users/:id", async (req, res) => {
 });
 
 router.put('/users/:id', (req, res) => {
-    // do something
+    User.findOne({ _id: req.params.id }).then(user => {
+        // Check if current password is correct
+        bcrypt.compare(req.body.currentPassword, user.password)
+        .then(isMatch => {
+            if(isMatch) {
+                // If current password is correct, update password
+                bcrypt.genSalt(10, (err, salt) => {
+                    bcrypt.hash(req.body.newPassword, salt, (err, hash) => {
+                        user.password = hash;
+                        user.save()
+                        .then(user => res.json(user))
+                        .catch(err => console.log(err));
+                    });
+                });
+            } else {
+                return res.status(400).json({ password: 'Current password is incorrect' });
+            }
+        });
+    });
 });
 
 module.exports = router;
