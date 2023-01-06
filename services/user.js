@@ -18,4 +18,7 @@ module.exports.create = async (body) => {
     });
   
     return await newUser.save();
-  };
+};
+
+module.exports.findOneById = async (id) => await User.findById(id);
+
