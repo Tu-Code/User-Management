@@ -1,5 +1,6 @@
 # User-Management
 
+## Functionalities
 1. List and view entries
 1. Add entries
 1. Change/Update entry's password
